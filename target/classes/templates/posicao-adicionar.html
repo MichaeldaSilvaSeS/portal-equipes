@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Posicao</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+
+<h3>Dados posição</h3>
+<form onsubmit="false">
+    <input type="hidden" name="codigoPosicao" id="codigoPosicao"></input>
+    </br>
+
+    <label>
+        Codigo vaga:
+        <input type="text" name="codigoVaga" id="codigoVaga"></input>
+    </label>
+    </br>
+
+    <label>
+        Nome Colaborador:
+        <input type="text" name="nomeColaborador" id="nomeColaborador"></input>
+    </label>
+    </br>
+
+    <label>
+        Alocação:
+        <select name="alocacao" id="alocacoes">
+        </select>
+    </label>
+    </br>
+
+    <label>
+        Título:
+        <select name="titulo" id="titulos">
+        </select>
+    </label>
+    </br>
+
+    <label>
+        Equipe:
+        <select name="equipe" id="equipes">
+        </select>
+    </label>
+    </br>
+
+    </br>
+    <button type="button" id="btnSalvar">Salvar</button>
+</form>
+
+<script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/2.6.1/jquery.mockjax.js"></script>
+
+<script type="text/javascript">
+    'use strict';
+    (function($){
+
+      $(function() {
+        var url = '/titulos';
+        /*
+        $.mockjax({
+            url:  url,
+            responseText: ["Team Member","Scrum Master","Product Owner","Tech Lead"]
+        });
+        */
+        $.ajax({
+          url: url
+        }).done(function(data) {
+            console.log(data);
+
+            $.each(data, function(index, item){
+                console.log(item);
+
+                var template = '<option value="$value">$label</option>';
+                template = template.replace('$value',item);
+                template = template.replace('$label',item);
+
+                $('#titulos').append(template);
+            });
+        });
+
+        var url1 = '/alocacoes';
+        /*
+        $.mockjax({
+            url:  url1,
+            responseText: ["Interna","Consultor"]
+        });
+        */
+        $.ajax({
+          url: url1
+        }).done(function(data) {
+            console.log(data);
+
+            $.each(data, function(index, item){
+                console.log(item);
+
+                var template = '<option value="$value">$label</option>';
+                template = template.replace('$value',item);
+                template = template.replace('$label',item);
+
+                $('#alocacoes').append(template);
+            });
+        });
+
+        var url2 = '/equipes';
+        /*
+        $.mockjax({
+            url:  url2,
+            responseText: [{"codigoEquipe":0,"nome":"Equipe 1","proposito":"Proposito 1","posicoes":[{"codigo":1,"codigoVaga":"01","titulo":"Tech lead","tipoAlocacao":"Interno","nomeColaborador":"Joao","codigoEquipe":0,"equipe":null}]},{"codigoEquipe":1,"nome":"Equipe 2","proposito":"Proposito 2","posicoes":[{"codigo":2,"codigoVaga":"02","titulo":"Tech lead","tipoAlocacao":"Interno","nomeColaborador":"Carlos","codigoEquipe":1,"equipe":null},{"codigo":3,"codigoVaga":"04","titulo":"Team Member","tipoAlocacao":"Consultor","nomeColaborador":"Daviv","codigoEquipe":1,"equipe":null}]}]
+        });
+        */
+        $.ajax({
+          url: url2
+        }).done(function(data) {
+            console.log(data);
+
+            $.each(data, function(index, item){
+                console.log(item);
+
+                var template = '<option value="$value">$label</option>';
+                template = template.replace('$value',item.codigoEquipe);
+                template = template.replace('$label',item.nome);
+
+                $('#equipes').append(template);
+            });
+        });
+
+        $("#btnSalvar").on('click', function(event){
+            $.ajax({
+                method: "POST",
+                url: '/posicao/adicionar',
+                contentType: 'application/json',
+                data: JSON.stringify({ codigo: 3, codigoVaga: "04" , titulo: "Team Member", tipoAlocacao: "Consultor", nomeColaborador: "Daviv", codigoEquipe: 1})
+            }).done(function(data) {
+                window.location.href = "/posicao";
+            });
+        });
+
+      });
+    })(jQuery);
+</script>
+</body>
+</html>

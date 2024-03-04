@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Posicao</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+
+<h3>Lista posições</h3>
+<form>
+    <label>
+        Nome Colaborador
+        <input type="text" id="buscaNomeColaborador"></input>
+    </label>
+    <button type="button" id="buscarPosicoes">Buscar</button>
+    </br>
+</form>
+<form>
+    <button type="button" id="adicionarPosicao">Adicionar Posição</button>
+    </br>
+</form>
+</br>
+</br>
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Vaga</th>
+                <th>Nome Colaborador</th>
+                <th>Alocacao</th>
+                <th>Titulo</th>
+                <th>Equipe</th>
+                <th>Historico</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="tablePosicoes">
+
+        </tbody>
+    </table>
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/2.6.1/jquery.mockjax.js"></script>
+
+<script type="text/javascript">
+    'use strict';
+    (function($){
+
+      $(function() {
+        $("#adicionarPosicao").on('click', function(event){
+            window.location.href = window.location.href+"/adicionar" ;
+        });
+
+        $("#buscarPosicoes").on('click', function(event){
+            $('#tablePosicoes').empty();
+            var nomeColaborador = $("#buscaNomeColaborador").val();
+            var url = "posicao/colaborador?nomeColaborador="+ nomeColaborador;
+            /*
+        $.mockjax({
+            url:  url,
+            responseText: [{"codigo":"01","titulo":"Tech lead","tipoAlocacao":"Interno","nomeColaborador":"Joao","codigoEquipe":0,"equipe":{"codigoEquipe":0,"nome":"Equipe 1","proposito":"Proposito 1","posicoes":null}}]
+        });
+        */
+
+            $.ajax({
+              url: url
+            }).done(function(data) {
+                console.log(data);
+                console.log('passou');
+
+                $.each(data, function(index , item){
+                    var btn = 'btnSelecionaPosicao$codigoPosicao'
+                    btn = btn.replace('$codigoPosicao',item.codigo);
+                    var posicao = "<tr><td>$codigoPosicao</td><td>$codigoVaga</td><td>$nomeColaborador</td><td>$tipoAlocacao</td><td>$titulo</td><td>$equipe</td><td><textarea cols='100' rows='5' readonly style='resize: none;'>$historico</textarea></td><td><button type='button' id='$btn'>Selecionar</button></td></tr>";
+                    posicao = posicao.replace('$codigoPosicao',item.codigo);
+                    posicao = posicao.replace('$codigoVaga',item.codigoVaga);
+                    posicao = posicao.replace('$nomeColaborador',item.nomeColaborador);
+                    posicao = posicao.replace('$tipoAlocacao',item.tipoAlocacao);
+                    posicao = posicao.replace('$titulo',item.titulo);
+                    posicao = posicao.replace('$equipe',item.equipe.nome);
+                    posicao = posicao.replace('$historico',item.historico);
+                    posicao = posicao.replace('$btn',btn);
+
+                    $("#tablePosicoes").append(posicao);
+                    $('#'+btn).on('click', function(e){
+                        var currentRow = $(this).closest('tr');
+                        var col1 = currentRow.find("td:eq(0)").text();
+
+                        console.log(col1);
+                        window.location.href = window.location.href+"/atualizar?codigoPosicao="+col1 ;
+                    });
+                });
+            });
+        });
+
+      });
+    })(jQuery);
+</script>
+</body>
+</html>

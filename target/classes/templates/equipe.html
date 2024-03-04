@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Bootstrap demo</title>
+
+    <link href="https://dabeng.github.io/OrgChart/css/jquery.orgchart.css" rel="stylesheet">
+    <style type="text/css">
+        .orgchart { background: #fff; }
+        .orgchart td.left, .orgchart td.right, .orgchart td.top { border-color: #aaa; }
+        .orgchart td>.down { background-color: #aaa; }
+        .orgchart .middle-level .title { background-color: #006699; }
+        .orgchart .middle-level .content { border-color: #006699; }
+        .orgchart .product-dept .title { background-color: #009933; }
+        .orgchart .product-dept .content { border-color: #009933; }
+        .orgchart .rd-dept .title { background-color: #993366; }
+        .orgchart .rd-dept .content { border-color: #993366; }
+        .orgchart .pipeline1 .title { background-color: #996633; }
+        .orgchart .pipeline1 .content { border-color: #996633; }
+        .orgchart .frontend1 .title { background-color: #cc0066; }
+        .orgchart .frontend1 .content { border-color: #cc0066; }
+    </style>
+    <style type="text/css">
+        html,body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            padding: 1px;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+            color: #333333;
+        }
+
+        #chart-container {
+            position: relative;
+            margin: 0.5rem;
+            overflow: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<form onsubmit="false">
+    <label>
+        Buscar:
+        <input type="text" id="txtBusca">
+    </label>
+    <label>
+        Pesquisa:
+        <select id="selPesquisa">
+            <option value="Timao">Timao</option>
+            <option value="Equipe">Equipe</option>
+            <option value="Proposito">Proposito</option>
+            <option value="Sistemas">Sistemas</option>
+            <option value="Colaboradores">Colaboradores</option>
+        </select>
+    </label>
+    <button type="button" id="btnPesquisar">Pesquisar</button>
+</form>
+<div id="chart-container"></div>
+<form onsubmit="false" style="display: inline !important;">
+    <button type="button" id="btnExportar">Exportar CSV</button>
+</form>
+<a href="posicao" target="_blank">Posições</a>
+<!--
+<a href="posicao/documento" rel="nofollow">Download arquivo</a>
+https://github.com/dabeng/OrgChart
+https://codepen.io/dabeng-the-styleful/pen/BabBbKY
+https://codepen.io/collection/AWxGVb/
+-->
+<script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/4.0.0/js/jquery.orgchart.min.js"></script>
+<script src="https://github.com/niklasvh/html2canvas/releases/download/v1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/2.6.1/jquery.mockjax.js"></script>
+<style type="text/css">
+    .orgchart { background: transparent; }
+    .node::after , .node::before {
+        border-color: grey !important;
+        background-color: grey !important;
+    }
+    .hierarchy::before, .hierarchy::after {
+        border-color: grey !important;
+    }
+    .title {
+        color: black !important;
+        background-color: transparent !important;
+    }
+    .content {
+        background-color: transparent !important;
+        border-color: transparent !important;
+    }
+    .oc-export-btn , #btnExportar {
+        margin: 0.5em !important;
+        padding: 0.25em 0.25em !important;
+    }
+    .orgchart .node .content {
+        height: auto !important;
+    }
+</style>
+<script type="text/javascript">
+    'use strict';
+(function($){
+    document.body.style.zoom = "175%";
+    $.urlParam = function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+                          .exec(window.location.search);
+
+        return (results !== null) ? results[1] || 0 : false;
+    }
+
+  $(function() {
+    var urlbusca = $.urlParam('busca');
+    var valpesquisa = $.urlParam('tipo');
+    var url = "equipes?";
+    url = url+"busca="+urlbusca+"&tipo="+valpesquisa;
+    console.log(url);
+    $('#txtBusca').val(urlbusca);
+    $('#selPesquisa').val(valpesquisa);
+/*
+    $.mockjax({
+        url:  url,
+        responseText: [{"codigoEquipe":0,"nome":"Equipe 1","proposito":"Proposito 1","posicoes":[{"codigo":1,"codigoVaga":"01","titulo":"Tech lead","tipoAlocacao":"Interno","nomeColaborador":"Joao","codigoEquipe":0,"equipe":null}]},{"codigoEquipe":1,"nome":"Equipe 2","proposito":"Proposito 2","posicoes":[{"codigo":2,"codigoVaga":"02","titulo":"Tech lead","tipoAlocacao":"Interno","nomeColaborador":"Carlos","codigoEquipe":1,"equipe":null},{"codigo":3,"codigoVaga":"04","titulo":"Team Member","tipoAlocacao":"Consultor","nomeColaborador":"Daviv","codigoEquipe":1,"equipe":null}]}]
+    });
+*/
+    $('#btnPesquisar').on('click',function(){
+        var busca = $('#txtBusca').val();
+        var pesquisa = $('#selPesquisa').val();
+
+        console.log(busca);
+        console.log(pesquisa);
+
+        window.location.href = "/equipe?"+"busca="+busca+"&tipo="+pesquisa;
+    });
+
+    $('#btnExportar').on('click',function(e){
+        e.preventDefault();
+
+        var busca = $('#txtBusca').val();
+        var pesquisa = $('#selPesquisa').val();
+
+        console.log(busca);
+        console.log(pesquisa);
+
+        window.open("/download?"+"busca="+busca+"&tipo="+pesquisa , '_blank')
+    });
+
+    $.ajax({
+      url: url
+    }).done(function(data) {
+      var urlbusca = $.urlParam('busca');
+      console.log(data);
+      var children = [];
+      var datasource = {
+        'name': (urlbusca == "0" ? "Equipes" : urlbusca),
+        'title': '',
+        'children': children
+      };
+
+
+      $.each(data, function( index, item){
+        var posicoes =  [];
+
+        $.each(item.posicoes, function(index, item){
+            posicoes.push({
+                'name': item.nomeColaborador,
+                'title': item.titulo + " - " + item.tipoAlocacao
+            });
+        });
+        children.push({
+            'name': item.nome,
+            'title': ("Sistema:"+ item.sistemas + "</br>Link:" + item.linkEquipe + "</br>Propósito:"+item.proposito),
+            'children': posicoes
+        });
+      });
+
+    $('#chart-container').orgchart({
+        'data' : datasource,
+        'collapsed': false,
+        'nodeTitle': 'name',
+        'nodeContent': 'title',
+        'exportButton': true,
+        'exportFilename': 'Imagem',
+        'exportButtonName': 'Exportar PNG',
+        'createNode': function($node, data){
+            $node.find('.title').append('<span></span>');
+
+            $($node).on('click',function(){
+                //alert('clickou');
+            });
+            $(".oci-menu").remove();
+            $($node).on('mouseenter', function(){
+                $(".topEdge , .rightEdge , .leftEdge , .oci-menu").remove();
+            });
+        },
+        'verticalLevel': 3,
+        'visibleLevel': 10,
+        'toggleSiblingsResp': false
+    });
+    //$('.orgchart').addClass('noncollapsable');
+
+    });
+
+  });
+})(jQuery);
+</script>
+</body>
+</html>
